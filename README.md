@@ -26,7 +26,7 @@ rateLimiter.Release("John Doe");
 
 ### TokenBucketKeyedRateLimiter
 
-A rate limiter per key that automatically releases claims a fixed interval after being increased.
+A rate limiter per key that automatically releases claims a fixed interval after being acquired.
 
 ```cs
 using TokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan.FromSeconds(1.0));
@@ -34,12 +34,12 @@ using TokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan
 // Add two claims for John Doe.
 bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
 
-// All claims will be removed after 1 second.
+// Both claims will be removed after 1 second.
 ```
 
 ### IncrementalTokenBucketKeyedRateLimiter
 
-A rate limiter per key that automatically releases claims gradually over the period of the interval.
+A rate limiter per key that automatically releases a claim in a queued manner every interval.
 
 ```cs
 using IncrementalTokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan.FromSeconds(1.0));
@@ -47,5 +47,5 @@ using IncrementalTokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interva
 // Add two claims for John Doe.
 bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
 
-// All claims will be removed gradually over the course of 1 second.
+// One claim will be removed after 1 second and another will be removed after 2 seconds.
 ```

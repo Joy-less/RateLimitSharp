@@ -7,7 +7,7 @@ namespace RateLimitSharp;
 
 /// <summary>
 /// A keyed rate limiter that increments a counter and decrements it incrementally after a specified interval.<br/>
-/// Unlike <see cref="TokenBucketKeyedRateLimiter"/>, the counter is decremented incrementally, meaning tokens will be released gradually.
+/// Unlike <see cref="TokenBucketKeyedRateLimiter"/>, only one token is released every interval, meaning tokens are released gradually.
 /// </summary>
 public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
@@ -15,9 +15,9 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     public long Limit { get; }
     /// <summary>
-    /// The incremental interval before a claim is automatically released.
+    /// The interval before a single claim in the queue is automatically released.
     /// </summary>
-    public TimeSpan Interval { get; }
+    public TimeSpan IncrementalInterval { get; }
 
     /// <summary>
     /// The lock used to access resources in this rate limiter.
@@ -39,9 +39,15 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Constructs a keyed token bucket.
     /// </summary>
-    public IncrementalTokenBucketKeyedRateLimiter(long limit, TimeSpan interval) {
+    /// <param name="limit">
+    /// The maximum number of claims.
+    /// </param>
+    /// <param name="incrementalInterval">
+    /// The incremental interval before a claim is automatically released.
+    /// </param>
+    public IncrementalTokenBucketKeyedRateLimiter(long limit, TimeSpan incrementalInterval) {
         Limit = limit;
-        Interval = interval;
+        IncrementalInterval = incrementalInterval;
     }
     /// <summary>
     /// Returns the remaining number of claims for the key.
@@ -139,7 +145,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
             // Release every interval until all gone
             while (true) {
                 // Wait for next release
-                await Task.Delay(Interval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
+                await Task.Delay(IncrementalInterval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
 
                 lock (Lock) {
                     // Release one
