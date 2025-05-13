@@ -35,6 +35,12 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Constructs a keyed token bucket.
     /// </summary>
+    /// <param name="limit">
+    /// The maximum number of claims.
+    /// </param>
+    /// <param name="interval">
+    /// The interval before a claim is automatically released.
+    /// </param>
     public TokenBucketKeyedRateLimiter(long limit, TimeSpan interval) {
         Limit = limit;
         Interval = interval;

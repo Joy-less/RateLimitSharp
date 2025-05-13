@@ -37,13 +37,13 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     private CancellationTokenSource CancelTokenSource = new();
 
     /// <summary>
-    /// Constructs a keyed token bucket.
+    /// Constructs a keyed incremental token bucket.
     /// </summary>
     /// <param name="limit">
     /// The maximum number of claims.
     /// </param>
     /// <param name="incrementalInterval">
-    /// The incremental interval before a claim is automatically released.
+    /// The interval before a single claim in the queue is automatically released.
     /// </param>
     public IncrementalTokenBucketKeyedRateLimiter(long limit, TimeSpan incrementalInterval) {
         Limit = limit;

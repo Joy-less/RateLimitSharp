@@ -26,6 +26,9 @@ public class ManualKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Constructs a keyed token bucket.
     /// </summary>
+    /// <param name="limit">
+    /// The maximum number of claims.
+    /// </param>
     public ManualKeyedRateLimiter(long limit) {
         Limit = limit;
     }
