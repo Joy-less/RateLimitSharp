@@ -121,7 +121,7 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     private async Task ScheduleReleaseAsync(object key, long amount) {
         // Wait for decrease
-        await Task.Delay(Interval, cancellationToken: CancelTokenSource.Token);
+        await Task.Delay(Interval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
         // Decrease amount added
         Release(key, amount);
     }

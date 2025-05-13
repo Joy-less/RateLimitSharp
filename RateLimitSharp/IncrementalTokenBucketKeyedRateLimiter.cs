@@ -144,7 +144,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
             // Decrease every interval until all gone
             while (true) {
                 // Wait for next decrease
-                await Task.Delay(IncrementalInterval, cancellationToken: CancelTokenSource.Token);
+                await Task.Delay(IncrementalInterval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
 
                 lock (Lock) {
                     // Decrease one
