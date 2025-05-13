@@ -15,7 +15,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     public long Limit { get; }
     /// <summary>
-    /// The interval before all uses are automatically replaced.
+    /// The incremental interval before a claim is automatically released.
     /// </summary>
     public TimeSpan Interval { get; }
 
@@ -35,11 +35,6 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// The canceller for the replace tasks.
     /// </summary>
     private CancellationTokenSource CancelTokenSource = new();
-
-    /// <summary>
-    /// The interval before a use is automatically replaced, calculated for regular intervals.
-    /// </summary>
-    public TimeSpan IncrementalInterval => Interval / Limit;
 
     /// <summary>
     /// Constructs a keyed token bucket.
@@ -143,8 +138,8 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
         try {
             // Decrease every interval until all gone
             while (true) {
-                // Wait for next decrease
-                await Task.Delay(IncrementalInterval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
+                // Wait for next release
+                await Task.Delay(Interval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
 
                 lock (Lock) {
                     // Decrease one
