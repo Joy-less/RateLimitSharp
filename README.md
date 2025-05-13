@@ -12,7 +12,7 @@ The recommended rate limiter for most cases is `IncrementalTokenBucketKeyedRateL
 
 ### ManualKeyedRateLimiter
 
-A rate limiter per key that you replace manually.
+A rate limiter per key that you release manually.
 
 ```cs
 using ManualKeyedRateLimiter rateLimiter = new(limit: 3);
@@ -26,7 +26,7 @@ rateLimiter.Release("John Doe");
 
 ### TokenBucketKeyedRateLimiter
 
-A rate limiter per key that automatically decreases claims a fixed interval after being increased.
+A rate limiter per key that automatically releases claims a fixed interval after being increased.
 
 ```cs
 using TokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan.FromSeconds(1.0));
@@ -39,7 +39,7 @@ bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
 
 ### IncrementalTokenBucketKeyedRateLimiter
 
-A rate limiter per key that automatically decreases claims gradually over the period of the interval.
+A rate limiter per key that automatically releases claims gradually over the period of the interval.
 
 ```cs
 using IncrementalTokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan.FromSeconds(1.0));

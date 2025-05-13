@@ -7,15 +7,15 @@ namespace RateLimitSharp;
 
 /// <summary>
 /// A keyed rate limiter that increments a counter and decrements it after a specified interval.<br/>
-/// Unlike <see cref="IncrementalTokenBucketKeyedRateLimiter"/>, the counter is decremented a fixed interval after being removed, meaning a lot of tokens may be replaced at once.
+/// Unlike <see cref="IncrementalTokenBucketKeyedRateLimiter"/>, the counter is decremented a fixed interval after being removed, meaning a lot of tokens may be released at once.
 /// </summary>
 public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
-    /// The maximum number of uses.
+    /// The maximum number of claims.
     /// </summary>
     public long Limit { get; }
     /// <summary>
-    /// The interval before a use is automatically replaced.
+    /// The interval before a claim is automatically released.
     /// </summary>
     public TimeSpan Interval { get; }
 
@@ -24,11 +24,11 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     private readonly Lock Lock = new();
     /// <summary>
-    /// The use counters for each key.
+    /// The claim counters for each key.
     /// </summary>
     private readonly Dictionary<object, long> Counters = [];
     /// <summary>
-    /// The canceller for the replace tasks.
+    /// The canceller for the release tasks.
     /// </summary>
     private CancellationTokenSource CancelTokenSource = new();
 
@@ -94,13 +94,13 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
         }
     }
     /// <summary>
-    /// Resets the number of uses for every key.
+    /// Resets the number of claims for every key.
     /// </summary>
     public void Reset() {
         lock (Lock) {
             // Remove all counters
             Counters.Clear();
-            // Cancel replace tasks
+            // Cancel release tasks
             CancelTokenSource.Cancel();
             CancelTokenSource.Dispose();
             CancelTokenSource = new CancellationTokenSource();
@@ -111,18 +111,18 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     public void Dispose() {
         GC.SuppressFinalize(this);
-        // Cancel replace tasks
+        // Cancel release tasks
         CancelTokenSource.Cancel();
         CancelTokenSource.Dispose();
     }
 
     /// <summary>
-    /// Schedules a task to decrease the specified number of claims for the key.
+    /// Schedules a task to release the specified number of claims for the key.
     /// </summary>
     private async Task ScheduleReleaseAsync(object key, long amount) {
-        // Wait for decrease
+        // Wait for release
         await Task.Delay(Interval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
-        // Decrease amount added
+        // Release amount added
         Release(key, amount);
     }
 }

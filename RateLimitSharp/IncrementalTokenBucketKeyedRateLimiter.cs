@@ -6,12 +6,12 @@ using Lock = object;
 namespace RateLimitSharp;
 
 /// <summary>
-/// A keyed rate limiter that increments a counter and decrements it regularly during a specified interval.<br/>
-/// Unlike <see cref="TokenBucketKeyedRateLimiter"/>, the counter is decremented incrementally, meaning tokens will be replaced gradually.
+/// A keyed rate limiter that increments a counter and decrements it incrementally after a specified interval.<br/>
+/// Unlike <see cref="TokenBucketKeyedRateLimiter"/>, the counter is decremented incrementally, meaning tokens will be released gradually.
 /// </summary>
 public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
-    /// The maximum number of uses.
+    /// The maximum number of claims.
     /// </summary>
     public long Limit { get; }
     /// <summary>
@@ -24,15 +24,15 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     private readonly Lock Lock = new();
     /// <summary>
-    /// The use counters for each key.
+    /// The claim counters for each key.
     /// </summary>
     private readonly Dictionary<object, long> Counters = [];
     /// <summary>
-    /// The keys with scheduled decreases.
+    /// The keys with scheduled releases.
     /// </summary>
     private readonly HashSet<object> KeysWithSchedules = [];
     /// <summary>
-    /// The canceller for the replace tasks.
+    /// The canceller for the release tasks.
     /// </summary>
     private CancellationTokenSource CancelTokenSource = new();
 
@@ -100,17 +100,17 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
         }
     }
     /// <summary>
-    /// Resets the number of uses for every key.
+    /// Resets the number of claims for every key.
     /// </summary>
     public void Reset() {
         lock (Lock) {
             // Remove all counters
             Counters.Clear();
-            // Cancel replace tasks
+            // Cancel release tasks
             CancelTokenSource.Cancel();
             CancelTokenSource.Dispose();
             CancelTokenSource = new CancellationTokenSource();
-            // Remove all replace debounces
+            // Remove all release debounces
             KeysWithSchedules.Clear();
         }
     }
@@ -119,16 +119,16 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     public void Dispose() {
         GC.SuppressFinalize(this);
-        // Cancel replace tasks
+        // Cancel release tasks
         CancelTokenSource.Cancel();
         CancelTokenSource.Dispose();
     }
 
     /// <summary>
-    /// Schedules a task to gradually decrease claims for the key until all gone.
+    /// Schedules a task to gradually release claims for the key until all gone.
     /// </summary>
     private async Task ScheduleReleaseAsync(object key) {
-        // Ensure not already running decrease loop
+        // Ensure not already running release loop
         lock (Lock) {
             if (!KeysWithSchedules.Add(key)) {
                 return;
@@ -136,13 +136,13 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
         }
 
         try {
-            // Decrease every interval until all gone
+            // Release every interval until all gone
             while (true) {
                 // Wait for next release
                 await Task.Delay(Interval, cancellationToken: CancelTokenSource.Token).ConfigureAwait(false);
 
                 lock (Lock) {
-                    // Decrease one
+                    // Release one
                     Release(key);
 
                     // Finish decreasing if full
@@ -153,7 +153,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
             }
         }
         finally {
-            // Finish decrease loop
+            // Finish release loop
             lock (Lock) {
                 KeysWithSchedules.Remove(key);
             }

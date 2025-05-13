@@ -10,7 +10,7 @@ namespace RateLimitSharp;
 /// </summary>
 public class ManualKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
-    /// The maximum number of uses.
+    /// The maximum number of claims.
     /// </summary>
     public long Limit { get; }
 
@@ -19,7 +19,7 @@ public class ManualKeyedRateLimiter : IKeyedRateLimiter {
     /// </summary>
     private readonly Lock Lock = new();
     /// <summary>
-    /// The use counters for each key.
+    /// The claim counters for each key.
     /// </summary>
     private readonly Dictionary<object, long> Counters = [];
 
