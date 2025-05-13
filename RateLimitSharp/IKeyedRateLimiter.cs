@@ -16,11 +16,11 @@ public interface IKeyedRateLimiter : IDisposable {
     /// <summary>
     /// Adds the specified number of claims for the key if possible.
     /// </summary>
-    public bool TryIncrease(object key, long amount = 1);
+    public bool TryAcquire(object key, long amount = 1);
     /// <summary>
     /// Removes the specified number of claims from the key.
     /// </summary>
-    public void Decrease(object key, long amount = 1);
+    public void Release(object key, long amount = 1);
     /// <summary>
     /// Resets the number of claims for every key.
     /// </summary>

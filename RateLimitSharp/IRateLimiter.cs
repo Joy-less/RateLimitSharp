@@ -16,11 +16,11 @@ public interface IRateLimiter : IDisposable {
     /// <summary>
     /// Adds the specified number of claims if possible.
     /// </summary>
-    public bool TryIncrease(long amount = 1);
+    public bool TryAcquire(long amount = 1);
     /// <summary>
     /// Removes the specified number of claims.
     /// </summary>
-    public void Decrease(long amount = 1);
+    public void Release(long amount = 1);
     /// <summary>
     /// Resets the number of claims.
     /// </summary>

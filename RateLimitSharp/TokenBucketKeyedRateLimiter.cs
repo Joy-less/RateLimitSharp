@@ -50,7 +50,7 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Adds the specified number of claims for the key if possible.
     /// </summary>
-    public bool TryIncrease(object key, long amount = 1) {
+    public bool TryAcquire(object key, long amount = 1) {
         // Ensure amount >= 0
         ArgumentOutOfRangeException.ThrowIfLessThan(amount, 0, nameof(amount));
 
@@ -68,14 +68,14 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
             Counters[key] = Counter;
 
             // Decrease counter after interval
-            _ = ScheduleDecreaseAsync(key, amount);
+            _ = ScheduleReleaseAsync(key, amount);
             return true;
         }
     }
     /// <summary>
     /// Removes the specified number of claims from the key.
     /// </summary>
-    public void Decrease(object key, long amount = 1) {
+    public void Release(object key, long amount = 1) {
         // Ensure amount >= 0
         ArgumentOutOfRangeException.ThrowIfLessThan(amount, 0, nameof(amount));
 
@@ -119,10 +119,10 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Schedules a task to decrease the specified number of claims for the key.
     /// </summary>
-    private async Task ScheduleDecreaseAsync(object key, long amount) {
+    private async Task ScheduleReleaseAsync(object key, long amount) {
         // Wait for decrease
         await Task.Delay(Interval, cancellationToken: CancelTokenSource.Token);
         // Decrease amount added
-        Decrease(key, amount);
+        Release(key, amount);
     }
 }

@@ -59,7 +59,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Adds the specified number of claims for the key if possible.
     /// </summary>
-    public bool TryIncrease(object key, long amount = 1) {
+    public bool TryAcquire(object key, long amount = 1) {
         // Ensure amount >= 0
         ArgumentOutOfRangeException.ThrowIfLessThan(amount, 0, nameof(amount));
 
@@ -78,7 +78,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
 
             // Decrease counter after interval
             if (Counter == 1) {
-                _ = ScheduleDecreaseAsync(key);
+                _ = ScheduleReleaseAsync(key);
             }
             return true;
         }
@@ -86,7 +86,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Removes the specified number of claims from the key.
     /// </summary>
-    public void Decrease(object key, long amount = 1) {
+    public void Release(object key, long amount = 1) {
         // Ensure amount >= 0
         ArgumentOutOfRangeException.ThrowIfLessThan(amount, 0, nameof(amount));
 
@@ -132,7 +132,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
     /// Schedules a task to gradually decrease claims for the key until all gone.
     /// </summary>
-    private async Task ScheduleDecreaseAsync(object key) {
+    private async Task ScheduleReleaseAsync(object key) {
         // Ensure not already running decrease loop
         lock (Lock) {
             if (!KeysWithSchedules.Add(key)) {
@@ -148,7 +148,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
 
                 lock (Lock) {
                     // Decrease one
-                    Decrease(key);
+                    Release(key);
 
                     // Finish decreasing if full
                     if (!Counters.ContainsKey(key)) {

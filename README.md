@@ -18,10 +18,10 @@ A rate limiter per key that you replace manually.
 using ManualKeyedRateLimiter rateLimiter = new(limit: 3);
 
 // Add a claim for John Doe.
-bool available = rateLimiter.TryIncrease("John Doe");
+bool available = rateLimiter.TryAcquire("John Doe");
 
 // Remove a claim from John Doe.
-rateLimiter.Decrease("John Doe");
+rateLimiter.Release("John Doe");
 ```
 
 ### TokenBucketKeyedRateLimiter
@@ -32,7 +32,7 @@ A rate limiter per key that automatically decreases claims a fixed interval afte
 using TokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan.FromSeconds(1.0));
 
 // Add two claims for John Doe.
-bool available = rateLimiter.TryIncrease("John Doe", amount: 2);
+bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
 
 // All claims will be removed after 1 second.
 ```
@@ -45,7 +45,7 @@ A rate limiter per key that automatically decreases claims gradually over the pe
 using IncrementalTokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan.FromSeconds(1.0));
 
 // Add two claims for John Doe.
-bool available = rateLimiter.TryIncrease("John Doe", amount: 2);
+bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
 
 // All claims will be removed gradually over the course of 1 second.
 ```
