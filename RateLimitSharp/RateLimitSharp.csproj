@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <VersionPrefix>1.0</VersionPrefix>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsTrimmable>True</IsTrimmable>
+    <IsAotCompatible>True</IsAotCompatible>
+
+    <!-- IDE0290: Use primary constructor -->
+    <NoWarn>IDE0290</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>RateLimitSharp</Title>
+    <Description>Simple rate limiters for resources in C#.</Description>
+    <Copyright>Joyless</Copyright>
+    <PackageProjectUrl>https://github.com/Joy-less/RateLimitSharp</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Joy-less/RateLimitSharp</RepositoryUrl>
+    <PackageTags>rate limit; rate limiter; throttle; token bucket</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md">
+      <Pack>True</Pack>
+      <PackagePath>/</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

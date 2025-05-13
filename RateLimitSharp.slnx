@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="RateLimitSharp.Tests/RateLimitSharp.Tests.csproj" />
+  <Project Path="RateLimitSharp/RateLimitSharp.csproj" />
+</Solution>
