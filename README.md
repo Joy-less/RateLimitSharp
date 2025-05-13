@@ -42,7 +42,7 @@ bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
 A rate limiter per key that automatically releases a claim in a queued manner every interval.
 
 ```cs
-using IncrementalTokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, interval: TimeSpan.FromSeconds(1.0));
+using IncrementalTokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, incrementalInterval: TimeSpan.FromSeconds(1.0));
 
 // Add two claims for John Doe.
 bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
