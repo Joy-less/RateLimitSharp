@@ -62,16 +62,16 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
 
         lock (Lock) {
             // Get counter
-            long Counter = Counters.GetValueOrDefault(key);
+            long counter = Counters.GetValueOrDefault(key);
 
             // Ensure new counter is under rate limit
-            if (Counter + amount > Limit) {
+            if (counter + amount > Limit) {
                 return false;
             }
 
             // Increase counter
-            Counter += amount;
-            Counters[key] = Counter;
+            counter += amount;
+            Counters[key] = counter;
 
             // Decrease counter after interval
             _ = ScheduleReleaseAsync(key, amount);
@@ -87,13 +87,13 @@ public class TokenBucketKeyedRateLimiter : IKeyedRateLimiter {
 
         lock (Lock) {
             // Get counter
-            if (Counters.TryGetValue(key, out long Counter)) {
+            if (Counters.TryGetValue(key, out long counter)) {
                 // Decrease counter
-                Counter -= amount;
-                Counters[key] = Counter;
+                counter -= amount;
+                Counters[key] = counter;
 
                 // Free memory
-                if (Counter <= 0) {
+                if (counter <= 0) {
                     Counters.Remove(key);
                 }
             }
