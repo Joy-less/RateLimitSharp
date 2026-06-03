@@ -78,9 +78,7 @@ public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
             Counters[key] = counter;
 
             // Decrease counter after interval
-            if (counter == 1) {
-                _ = ScheduleReleaseAsync(key);
-            }
+            _ = ScheduleReleaseAsync(key);
             return true;
         }
     }
