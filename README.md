@@ -47,5 +47,5 @@ using IncrementalTokenBucketKeyedRateLimiter rateLimiter = new(limit: 3, increme
 // Add two claims for John Doe.
 bool available = rateLimiter.TryAcquire("John Doe", amount: 2);
 
-// One claim will be removed after 1 second and another will be removed after 2 seconds.
+// One claim will be removed after 1 second and another will be removed after another 1 second.
 ```
