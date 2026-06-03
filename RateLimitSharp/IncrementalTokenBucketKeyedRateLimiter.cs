@@ -7,7 +7,7 @@ namespace RateLimitSharp;
 
 /// <summary>
 /// A keyed rate limiter that increments a counter and decrements it incrementally after a specified interval.<br/>
-/// Unlike <see cref="TokenBucketKeyedRateLimiter"/>, only one token is released every interval, meaning tokens are released gradually.
+/// Unlike <see cref="TokenBucketKeyedRateLimiter"/>, only one token is released every interval, meaning tokens are always released gradually.
 /// </summary>
 public class IncrementalTokenBucketKeyedRateLimiter : IKeyedRateLimiter {
     /// <summary>
